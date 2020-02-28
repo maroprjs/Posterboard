@@ -12,17 +12,19 @@
 #include "Arduino.h"
 #include "Print.h"
 #include <SoftwareSerial.h>
+#include "Debug.h"
 
-#define RS485_PIN_DE      0b00010000 //Digital Pin 7
-#define RS485_PIN_RE      0b00001000 //Digital Pin 6
-#define RS485_DIR_REG     DDRH
-#define RS485_PORT_REG    PORTH
-/*
-#define RS485_PIN_DE      0b01000000
-#define RS485_PIN_RE      0b00100000
-#define RS485_DIR_REG     DDRJ
-#define RS485_PORT_REG    PORTJ
-*/
+#ifdef TEST_WITH_MEGA //flag defined in Debug.h
+   #define RS485_PIN_DE      0b00010000 //Digital Pin 7
+   #define RS485_PIN_RE      0b00001000 //Digital Pin 6
+   #define RS485_DIR_REG     DDRH
+   #define RS485_PORT_REG    PORTH
+#else //normal operation for controllino (these ports are not in use with Arduino Mega)
+   #define RS485_PIN_DE      0b01000000 //PJ6 = 69
+   #define RS485_PIN_RE      0b00100000 //PJ5 = 68
+   #define RS485_DIR_REG     DDRJ
+   #define RS485_PORT_REG    PORTJ
+#endif
 #define RS485_CLEAR_DE    RS485_PORT_REG &= ~RS485_PIN_DE
 #define RS485_CLEAR_RE    RS485_PORT_REG &= ~RS485_PIN_RE
 #define RS485_SET_DE      RS485_PORT_REG |= RS485_PIN_DE

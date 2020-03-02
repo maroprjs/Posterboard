@@ -139,12 +139,10 @@ pinSample_t solar1ADSample = 0;;
 pinSample_t solar2ADSample = 0;;
 pinSample_t solar3ADSample = 0;;
 pinSample_t solar4ADSample = 0;;
-int offset1 = -2;//the windmill solars need a little more light
-int offset2 = 0;
-Solarmodul solarmodul1(CONTROLLINO_PIN_HEADER_ANALOG_ADC_IN_12, &solar1ADSample, offset1); //from Windmill1
-Solarmodul solarmodul2(CONTROLLINO_PIN_HEADER_ANALOG_ADC_IN_13, &solar2ADSample, offset1); //from Windmill2
-Solarmodul solarmodul3(CONTROLLINO_PIN_HEADER_ANALOG_ADC_IN_08, &solar3ADSample, offset2); //from House1
-Solarmodul solarmodul4(CONTROLLINO_PIN_HEADER_ANALOG_ADC_IN_09, &solar4ADSample, offset2); //from House2
+Solarmodul solarmodul1(CONTROLLINO_PIN_HEADER_ANALOG_ADC_IN_12, &solar1ADSample); //from Windmill1
+Solarmodul solarmodul2(CONTROLLINO_PIN_HEADER_ANALOG_ADC_IN_13, &solar2ADSample); //from Windmill2
+Solarmodul solarmodul3(CONTROLLINO_PIN_HEADER_ANALOG_ADC_IN_08, &solar3ADSample); //from House1
+Solarmodul solarmodul4(CONTROLLINO_PIN_HEADER_ANALOG_ADC_IN_09, &solar4ADSample); //from House2
 Solarfarm solarfarm(&solarmodul1, &solarmodul2, &solarmodul3, &solarmodul4);
 //Solarfarm solarfarm(&solarmodul1); //for testing
 

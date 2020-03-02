@@ -88,7 +88,7 @@ void Solarmodul::loop(void){
 	      if((millis() - _startMillis >= _sampleInterval) && (_avgStd->getN() >= NUM_OF_STD_SAMPLES))
 	      {
 	         *_currentSample = analogRead(_sensingPin);
-		     if (_avgStd->checkAndAddReading(*_currentSample) == false){
+		     if (_avgStd->checkAndAddReading(*_currentSample) == false){ //readning not added due bigger than deviation
                  PRINT("Solar Emition Recognized! currentSample: ");PRINT(*_currentSample);PRINT(" STD deviation: ");PRINTLN(_avgStd->getStd());
 	        	 //emit solar power for some time
 	        	 _emitSolarPower = ON;//true;
@@ -111,7 +111,6 @@ void Solarmodul::updateCalibrationValues(void){
 	if (millis() - _lastCalibrationUpdated <= _calibrationValueUpdateInterval) {
 
 		   _sampleDeviation = _avgStd->getStd() ;
-		    // record the maximum sensor value
 		    if (_sampleDeviation > _deviationMax) {
 		      _deviationMax = _sampleDeviation;
 		    };

@@ -33,6 +33,8 @@ public:
 	bool isChargingOn(void);
 	bool isChargingOff(void);
 	bool statusHasChanged(void);
+	void setAutomaticModusOn(void);
+	void setAutomaticModusOff(void);
 	virtual ~ChargingStation();
 private:
 	CRGB* _crgb;

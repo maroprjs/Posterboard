@@ -15,7 +15,7 @@ ChargingStation::ChargingStation(driverPin_t statusInPin, driverPin_t statusOutP
 	_charging = OFF;
 	_statusInPin = statusInPin;
 	_statusOutPin = statusOutPin;
-	_chargingManuallyOn = false;
+	_chargingManuallyOn = false;//auto == on
 	_statusHasChanged = true;
 
 }
@@ -43,11 +43,21 @@ void ChargingStation::loop(void){
 }
 
 
+void ChargingStation::setAutomaticModusOn(void){
+	this->setChargingOff();
+	_chargingManuallyOn = false;
+}
 
-//normal operation...if a car is in charing it will be animated
+void ChargingStation::setAutomaticModusOff(void){
+	_chargingManuallyOn = true;
+	_statusHasChanged = true;
+}
+
+
+
+//normal operation...if a_chargingManuallyOn car is in charing it will be animated
 void ChargingStation::setChargingOff(void){
 	digitalWrite(_statusOutPin, LOW);
-	_chargingManuallyOn = false;
 	_charging = OFF; //animation
 	_statusHasChanged = true;
 }
@@ -55,7 +65,6 @@ void ChargingStation::setChargingOff(void){
 // charging requested from GUI even if there is no car
 void ChargingStation::setChargingOn(void){
 	digitalWrite(_statusOutPin, HIGH);
-	_chargingManuallyOn = true;
 	_charging = ON;//animation
 	_statusHasChanged = true;
 

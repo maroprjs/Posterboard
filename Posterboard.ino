@@ -246,9 +246,13 @@ elapsedMillis_t previousMillis = 0;
 void setup()
 {
 	PRINT_INIT( 9600 );
+	FastLED.addLeds<WS2811, LED_STRIPE_PIN, RGB>(leds, NUM_OF_LEDS);
+	for (int i = 0; i < NUM_OF_LEDS; i++){// init start
+		leds[i] = CRGB::Yellow;
+	};
+	FastLED.show();
 	sarModem = &Serial2;
 	sarModem->begin(9600);
-	FastLED.addLeds<WS2811, LED_STRIPE_PIN, RGB>(leds, NUM_OF_LEDS);
 	hydroStation.setup();
 	solarfarm.setup();
 	modbus.begin(MODBUS_SPEED);
@@ -272,6 +276,13 @@ void setup()
     chargingStation.setup();
     multimeter.setup();
     gui.setup();
+	for (int i = 0; i < NUM_OF_LEDS; i++){// init start
+		leds[i] = CRGB::Black;
+	};
+	mast1.beaconOn();
+	mast2.beaconOn();
+	mast3.beaconOn();
+	FastLED.show();
 
 
 
@@ -325,22 +336,20 @@ void loop()
 	   memset(measData, 0, 512);
 
 	   //////////////////// Status Check  ////////////////////////////////
-	  //TODO: check status change in objects and publish via sarModem as well
-	   //check status windill 1 & 2
-
+	   //TODO: check status change in objects and publish via sarModem as well
 	   solarOn = solarfarm.isLightOn(); //status house 1-4 and solarpark, by checking associated Solarfarm as a whole
 	   if (solarOn > 0) { //can also check return value which solarpanel is active
-		   house1.lightOn();house2.lightOn();house3.lightOn();house4.lightOn();solarpark.lightOn();
+		  house1.lightOn();house2.lightOn();house3.lightOn();house4.lightOn();solarpark.lightOn();
 	   }else{
-		   house1.lightOff();house2.lightOff();house3.lightOff();house4.lightOff();solarpark.lightOff();
+		  house1.lightOff();house2.lightOff();house3.lightOff();house4.lightOff();solarpark.lightOff();
 	   };
 	   windmill1On = windmill1.isOn();
 	   windmill2On = windmill1.isOn();
 	   if ((solarOn > 0) && ((windmill1On == true) || (windmill2On == true))){
-		   if (hydroStation.isOn()) hydroStation.turnOff();
+		  if (hydroStation.isOn()) hydroStation.turnOff();
 	   }else{
-		   if (hydroStation.isOff()) hydroStation.turnOn();
-	   }
+		  if (hydroStation.isOff()) hydroStation.turnOn();
+	   };
 	   //////////////////// Status  Report ////////////////////////////////
 	   bool newObjStatus = false;;
 	   //windmills
@@ -357,15 +366,18 @@ void loop()
 	   bool sub3 = substation3.statusHasChanged();
 	   //hydro station
 	   bool hydro = hydroStation.statusHasChanged();
+	   //GUI station
+	   bool bGui = gui.statusHasChanged();
 	   //DPRINT(wm1);DPRINT(wm2);DPRINT(wm3);DPRINT(solar);DPRINT(charge);DPRINT(sub1);DPRINT(sub2);DPRINTLN(sub3);
-	   newObjStatus = (wm1 || wm2 || wm3 || solar || charge || sub1 || sub2 || sub3 || hydro); //DPRINTLN(newObjStatus);
+	   newObjStatus = (wm1 || wm2 || wm3 || solar || charge || sub1 || sub2 || sub3 || hydro || bGui); //DPRINTLN(newObjStatus);
        if (newObjStatus == true){
     	   wm1 = windmill1.isOn();wm2 = windmill2.isOn();wm3 = windmill3.isOn();
     	   solar = solarfarm.isLightOn();
     	   charge = chargingStation.isChargingOn();
     	   sub1 = substation1.isActive();sub2 = substation2.isActive();sub3 = substation3.isActive();
     	   hydro = hydroStation.isOn();
-    	   sprintf(stateData,"{\"topic\":\"status\",\"wm1\":%d,\"wm2\":%d,\"wm3\":%d,\"solar\":%d,\"charge\":%d,\"sub1\":%d,\"sub2\":%d,\"sub3\":%d,\"hydro\":%d}", wm1, wm2, wm3, solar, charge,sub1, sub2,sub3,hydro );
+    	   bGui = gui.isAutoOn();
+    	   sprintf(stateData,"{\"topic\":\"status\",\"wm1\":%d,\"wm2\":%d,\"wm3\":%d,\"solar\":%d,\"charge\":%d,\"sub1\":%d,\"sub2\":%d,\"sub3\":%d,\"hydro\":%d,\"auto\":%d}", wm1, wm2, wm3, solar, charge,sub1, sub2,sub3,hydro,bGui);
     	   PRINTLN(stateData);
     	   sarModem->write(stateData);
     	   newObjStatus = false;

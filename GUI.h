@@ -15,7 +15,7 @@
 #include "ChargingStation.h"
 
 #define MAX_CMD_STR_BUFFER (25)
-#define NUM_OF_CMD (12)
+#define NUM_OF_CMD (14)
 #define MODEM_CHECK_INTERVAL (100)
 
 typedef struct tillCmd_t { //this is On Off time for the driving pin of the voltage meter
@@ -29,6 +29,8 @@ public:
 	virtual ~GUI();
 	void setup(void);
 	void loop(void);
+	bool isAutoOn(void);
+	bool statusHasChanged(void);
 private:
 	HardwareSerial* _modem;
 	Solarfarm* _solarfarm;
@@ -42,16 +44,10 @@ private:
 	String _cmdString;
 	//std::vector<tillCmd_t> _tillCmdVector; <-no std for vector inluded by default
 	tillCmd_t* _tillCmdArray;
-	void windmill1On(void);
-	void windmill1Off(void);
-	void windmill2On(void);
-	void windmill2Off(void);
-	void solarfarmOn(void);
-	void solarfarmOff(void);
-	void chargingStationOn(void);
-	void chargingStationOff(void);
-	void hydroOn(void);
-	void hydroOff(void);
+	on_off_state_t _auto;
+	bool _statusHasChanged;
+	void setAutomaticModusOn(void);
+	void setAutomaticModusOff(void);
 	void handleCmd(String cmdStr);
 	bool cmdContains(String s, String search);
 

@@ -20,6 +20,8 @@ GUI::GUI(HardwareSerial* modem, Solarfarm* solarfarm, Windmill* windmill1, Windm
 	_tillCmdArray = NULL;
 	_startMillis = 0;
 	_checkInterval = MODEM_CHECK_INTERVAL;
+	_auto = ON;
+	_statusHasChanged = true;
 }
 
 void GUI::setup(void){
@@ -37,6 +39,8 @@ void GUI::setup(void){
 	_tillCmdArray[9].cmdStr = "{\"charge\":0}\n"; //_tillCmdArray[7].call = chargingStationOff;
 	_tillCmdArray[10].cmdStr = "{\"hydro\":1}\n"; //_tillCmdArray[8].call = hydroOn;
 	_tillCmdArray[11].cmdStr = "{\"hydro\":0}\n"; //_tillCmdArray[9].call = hydroOff;
+	_tillCmdArray[12].cmdStr = "{\"auto\":1}\n"; //
+	_tillCmdArray[13].cmdStr = "{\"auto\":0}\n"; //
 	_startMillis= millis();
 }
 
@@ -62,6 +66,10 @@ void GUI::loop(void){
     };
 }
 
+bool GUI::isAutoOn(){
+	return ((_auto == ON) ? true : false);
+}
+
 void GUI::handleCmd(String cmdStr){
 	int i = 0;
 	while (i <= NUM_OF_CMD){
@@ -71,19 +79,19 @@ void GUI::handleCmd(String cmdStr){
 	DPRINT(_tillCmdArray[i].cmdStr);
 	switch( i ) {
 	   case 0:
-		   _windmill1->turnOnManually();
+		   _windmill1->turnOn();
 		   break;
 	   case 1:
 		   _windmill1->turnOff();
 		   break;
 	   case 2:
-		   _windmill2->turnOnManually();
+		   _windmill2->turnOn();
 		   break;
 	   case 3:
 		   _windmill2->turnOff();
 		   break;
 	   case 4:
-		   _windmill3->turnOnManually();
+		   _windmill3->turnOn();
 		   break;
 	   case 5:
 		   _windmill3->turnOff();
@@ -107,41 +115,47 @@ void GUI::handleCmd(String cmdStr){
 		   _hydroStation->turnOff();
 		   break;
 	   case 12:
+		   this->setAutomaticModusOn();
+		   break;
+	   case 13:
+		   this->setAutomaticModusOff();
+		   break;
+	   case 14:
 		   PRINTLN("Command received but not recognized!!");
 	};
 }
 
-void GUI::windmill1On(void){
-	_windmill1->turnOn();
-}
-void GUI::windmill1Off(void){
-	//_windmill1->turnOff();
-}
-void GUI::windmill2On(void){
-	//_windmill2->turnOn();
-}
-void GUI::windmill2Off(void){
-	//_windmill2->turnOff();
-}
-void GUI::solarfarmOn(void){
-	//_solarfarm->turnOn();
-}
-void GUI::solarfarmOff(void){
-	//_solarfarm->turnOff();
-}
-void GUI::chargingStationOn(void){
-	//
-}
-void GUI::chargingStationOff(void){
-	//
-}
-void GUI::hydroOn(void){
-	//
+
+
+void GUI::setAutomaticModusOn(void){
+	_auto = ON;
+	_windmill1->setAutomaticModusOn();
+	_windmill2->setAutomaticModusOn();
+	_windmill3->setAutomaticModusOn();
+	_solarfarm->setAutomaticModusOn();
+	_chargingStation->setAutomaticModusOn();
+	//_hydroStation <- not needed here, controlled by posterboard.ino
+	_statusHasChanged = true;
 }
 
-void GUI::hydroOff(void){
-	//
+void GUI::setAutomaticModusOff(void){
+	_auto = OFF;
+	_windmill1->setAutomaticModusOff();
+	_windmill2->setAutomaticModusOff();
+	_windmill3->setAutomaticModusOff();
+	_solarfarm->setAutomaticModusOff();
+	_chargingStation->setAutomaticModusOff();
+	//_hydroStation <- not needed here, controlled by posterboard.ino
+	_statusHasChanged = true;
 }
+
+bool GUI::statusHasChanged(void){
+    bool retStat = _statusHasChanged;
+    _statusHasChanged = false;
+    return retStat;
+}
+
+
 bool GUI::cmdContains(String s, String search) {
 	bool retVal = false;
 	if (search.length() > s.length()) return retVal;

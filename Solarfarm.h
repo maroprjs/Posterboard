@@ -22,13 +22,13 @@ public:
 	void turnOn(void);
 	void turnOff(void);
 	bool statusHasChanged(void);
+	void setAutomaticModusOn(void);
+	void setAutomaticModusOff(void);
 	virtual ~Solarfarm();
 private:
 	Solarmodul* _solarArray[NUM_OF_SOLAR_MODULES];
-
-	 //bool _solarCheckStopped;
-	 //uint16_t _manualOnToggle;
-	 //uint16_t _manualOffToggle;
+	on_off_state_t _auto;
+	bool _lightOn;
 	bool _statusHasChanged;
 
 

@@ -14,15 +14,11 @@ Windmill::Windmill(driverPin_t motorPin, CRGB* crgb, windspeed_t* wind) {
 	_on_off_state = OFF;
 	_measurementInterval =  DEFAULT_MEASUREMENT_INTERVAL;
 	_elapsedTime = 0;
-	_windCheckStopped = true;
 	_ledStepCountMax = LED_FADING_TIME / LED_MAX_BRIGHTNESS;
 	_ledStepCounter = 0;
 	_lastLEDUpdate = 0;
-	//_manualOnToggle = 0;
-	//_manualOffToggle = 0;
 	_statusHasChanged = true;
-
-
+	_auto = ON;
 }
 
 
@@ -30,11 +26,10 @@ void Windmill::setup(void){
    pinMode(_motorPin, OUTPUT);
    turnOff();
    _elapsedTime = millis();
-   startWindCheck();
 }
 
 void Windmill::loop(void){
-	if ( ! _windCheckStopped){
+	if (_auto == ON){
 		if (millis() >= (_elapsedTime + _measurementInterval)){
 			if ((*_wind >= WIND_THRESHOLD_ON) && (_on_off_state == OFF)){//needs to be called only when off
 				turnOn();
@@ -53,6 +48,16 @@ void Windmill::loop(void){
 
 }
 
+void Windmill::setAutomaticModusOn(void){
+	_statusHasChanged = true;
+	_auto = ON;
+}
+
+void Windmill::setAutomaticModusOff(void){
+	_statusHasChanged = true;
+	_auto = OFF;
+}
+
 void Windmill::ledAnimation(void){
 
 		if (millis() >= (_lastLEDUpdate + LED_UPDATE_INTERVAL)){
@@ -69,15 +74,11 @@ void Windmill::ledAnimation(void){
 }
 
 void Windmill::toggleOnOff(void){
-	   //_manualOffToggle++;
-	   //if (_manualOffToggle % 2 ){
-		   //stopWindCheck();
 		   if (_on_off_state == ON) {
 			   turnOff();
 		   }else{
 			   turnOn();
 		   };
-	   //};
 }
 
 void Windmill::turnOff(void){ //turns off the motor
@@ -95,14 +96,6 @@ void Windmill::turnOn(void){//turns the motor on
    _statusHasChanged = true;
 }
 
-void Windmill::turnOnManually(void){//turns the motor on
-   digitalWrite(_motorPin, HIGH);
-   *_crgb = CRGB::Red;
-   _on_off_state = ON;
-   _elapsedTime = _elapsedTime + 20000;
-   _statusHasChanged = true;
-}
-
 
 bool Windmill::isOff(void){
 	return ((_on_off_state == OFF) ? true : false);
@@ -112,18 +105,8 @@ bool Windmill::isOn(void){
 	return ((_on_off_state == ON) ? true : false);
 }
 
-//start-/stop- mechanism if windmill to be switched on via API ("manually").
-void Windmill::startWindCheck(){ //starts to check wind measurement and turns motor on at threshold
-	turnOff();
-	_elapsedTime = millis();
-	_windCheckStopped = false;
 
-}
 
-void Windmill::stopWindCheck(){//wind measurement stop
-	_windCheckStopped = true;
-
-}
 
 bool Windmill::statusHasChanged(void){
     bool retStat = _statusHasChanged;

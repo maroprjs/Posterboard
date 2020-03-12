@@ -26,15 +26,14 @@ public:
 	void setup(void);
 	void loop(void);
 	void turnOn(void);
-	void turnOnManually(void);
 	void turnOff(void);
 	void toggleOnOff(void);
 	bool isOn(void);
 	bool isOff(void);
-	void startWindCheck();
-	void stopWindCheck();
 	void ledAnimation(void);
 	bool statusHasChanged(void);
+	void setAutomaticModusOn(void);
+	void setAutomaticModusOff(void);
 	virtual ~Windmill();
 private:
 	driverPin_t _motorPin;
@@ -46,9 +45,7 @@ private:
 	 elapsedMillis_t _lastLEDUpdate;
 	 simpleCount_t _ledStepCounter;
 	 simpleCount_t _ledStepCountMax;
-	 bool _windCheckStopped;
-	 //uint16_t _manualOnToggle;
-	 //uint16_t _manualOffToggle;
+	 on_off_state_t _auto;
 	 bool _statusHasChanged;
 };
 
